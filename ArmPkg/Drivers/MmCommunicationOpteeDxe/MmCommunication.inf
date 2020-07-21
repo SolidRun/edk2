@@ -36,7 +36,7 @@
   OpteeLib
 
 [Protocols]
-  gEfiMmCommunicationProtocolGuid              ## PRODUCES
+  gEfiMmCommunication2ProtocolGuid              ## PRODUCES
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
