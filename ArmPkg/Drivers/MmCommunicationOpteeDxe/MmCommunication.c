@@ -55,8 +55,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 MmCommunicate (
-  IN CONST EFI_MM_COMMUNICATION_PROTOCOL  *This,
-  IN OUT VOID                             *CommBuffer,
+  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL *This,
+  IN OUT VOID                             *CommBufferPhysical,
+  IN OUT VOID                             *CommBufferVirtual,
   IN OUT UINTN                            *CommSize OPTIONAL
   )
 {
@@ -64,7 +65,7 @@ MmCommunicate (
   OPTEE_MM_SESSION              *OpteeMm;
   OPTEE_INVOKE_FUNCTION_ARG     InvokeArg;
 
-  if (This == NULL || CommBuffer == NULL ||
+  if (This == NULL || CommBufferVirtual == NULL ||
       CommSize == NULL || *CommSize == 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -83,7 +84,7 @@ MmCommunicate (
   InvokeArg.Function = OPTEE_TA_MM_FUNC_COMMUNICATE;
   InvokeArg.Session = OpteeMm->Session;
   InvokeArg.Params[0].Attribute = OPTEE_MESSAGE_ATTRIBUTE_TYPE_MEMORY_INOUT;
-  InvokeArg.Params[0].Union.Memory.BufferAddress = (UINTN) CommBuffer;
+  InvokeArg.Params[0].Union.Memory.BufferAddress = (UINTN) CommBufferVirtual;
   InvokeArg.Params[0].Union.Memory.Size = *CommSize;
   InvokeArg.Params[1].Attribute = OPTEE_MESSAGE_ATTRIBUTE_TYPE_VALUE_OUTPUT;
 
@@ -159,7 +160,7 @@ MmGuidedEventNotify (
   Header.Data[0] = 0;
 
   Size = sizeof (Header);
-  MmCommunicate (&mOpteeMm.Mm, &Header, &Size);
+  MmCommunicate (&mOpteeMm.Mm, &Header, &Header, &Size);
 }
 
 EFI_STATUS
@@ -195,7 +196,7 @@ MmCommunicationInitialize (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mOpteeMm.Handle,
-                  &gEfiMmCommunicationProtocolGuid,
+                  &gEfiMmCommunication2ProtocolGuid,
                   &mOpteeMm.Mm,
                   NULL
                   );
