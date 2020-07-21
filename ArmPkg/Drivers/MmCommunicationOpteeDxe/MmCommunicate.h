@@ -11,7 +11,7 @@
 
 #include <Uefi.h>
 
-#include <Protocol/MmCommunication.h>
+#include <Protocol/MmCommunication2.h>
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
@@ -48,7 +48,7 @@ typedef struct _OPTEE_MM_SESSION      OPTEE_MM_SESSION;
 struct _OPTEE_MM_SESSION {
   UINT32                            Signature;
   EFI_HANDLE                        Handle;
-  EFI_MM_COMMUNICATION_PROTOCOL     Mm;
+  EFI_MM_COMMUNICATION2_PROTOCOL    Mm;
   UINT32                            Session;
 };
 

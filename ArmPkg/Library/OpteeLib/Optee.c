@@ -23,12 +23,11 @@
 #include <OpteeSmc.h>
 #include <Uefi.h>
 
-STATIC OPTEE_SHARED_MEMORY_INFORMATION OpteeSharedMemoryInformation = { 0 };
+OPTEE_SHARED_MEMORY_INFORMATION OpteeSharedMemoryInformation = { 0 };
 
-STATIC EFI_EVENT mSetVirtualAddressMapEvent;
+EFI_EVENT mSetVirtualAddressMapEvent;
 
-EFI_PHYSICAL_ADDRESS BeforeVirtAddr = 0;
-EFI_PHYSICAL_ADDRESS AfterVirtAddr = 0;
+STATIC EFI_PHYSICAL_ADDRESS mOpteeSharedPhysicalBase;
 
 /**
   Check for OP-TEE presence.
@@ -120,6 +119,7 @@ OpteeSharedMemoryRemap (
   }
 
   OpteeSharedMemoryInformation.Base = PhysicalAddress;
+  mOpteeSharedPhysicalBase = OpteeSharedMemoryInformation.Base;
   OpteeSharedMemoryInformation.Size = Size;
 
   return EFI_SUCCESS;
@@ -143,12 +143,11 @@ NotifySetVirtualAddressMap (
 {
   EFI_STATUS    Status;
 
-  BeforeVirtAddr = OpteeSharedMemoryInformation.Base;
   Status = EfiConvertPointer (
            0x0,
            (VOID **)&OpteeSharedMemoryInformation.Base
            );
-  AfterVirtAddr = OpteeSharedMemoryInformation.Base;
+
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -214,7 +213,7 @@ OpteeCallWithArg (
   ZeroMem (&ArmSmcArgs, sizeof (ARM_SMC_ARGS));
   ArmSmcArgs.Arg0 = OPTEE_SMC_CALL_WITH_ARG;
 
-  UINT64 new_addr = (PhysicalArg - AfterVirtAddr) + BeforeVirtAddr;
+  UINT64 new_addr = (PhysicalArg - OpteeSharedMemoryInformation.Base) + mOpteeSharedPhysicalBase;
   ArmSmcArgs.Arg1 = (UINT32)(new_addr >> 32);
   ArmSmcArgs.Arg2 = (UINT32)new_addr;
 
@@ -390,7 +389,7 @@ OpteeToMessageParam (
         (VOID *)(UINTN)InParam->Union.Memory.BufferAddress,
         InParam->Union.Memory.Size
         );
-      MessageParam->Union.Memory.BufferAddress = (UINT64)((ParamSharedMemoryAddress- AfterVirtAddr) + BeforeVirtAddr);
+      MessageParam->Union.Memory.BufferAddress = (UINT64)((ParamSharedMemoryAddress - OpteeSharedMemoryInformation.Base) + mOpteeSharedPhysicalBase);
       MessageParam->Union.Memory.Size = InParam->Union.Memory.Size;
 
       Size = (InParam->Union.Memory.Size + sizeof (UINT64) - 1) &
@@ -452,7 +451,7 @@ OpteeFromMessageParam (
 
       CopyMem (
         (VOID *)(UINTN)OutParam->Union.Memory.BufferAddress,
-        (VOID *)(UINTN)((MessageParam->Union.Memory.BufferAddress - BeforeVirtAddr) + AfterVirtAddr),
+        (VOID *)(UINTN)((MessageParam->Union.Memory.BufferAddress - mOpteeSharedPhysicalBase) + OpteeSharedMemoryInformation.Base),
         MessageParam->Union.Memory.Size
         );
       OutParam->Union.Memory.Size = MessageParam->Union.Memory.Size;
@@ -480,7 +479,10 @@ OpteeInvokeFunction (
   if (OpteeSharedMemoryInformation.Base == 0) {
     DEBUG ((DEBUG_WARN, "OP-TEE not initialized\n"));
     return EFI_NOT_STARTED;
+  } else {
+    DEBUG ((DEBUG_INFO, "OP-TEE OpteeSharedMemoryInformation.Base is 0x%lx\n", OpteeSharedMemoryInformation.Base));
   }
+  
 
   MessageArg = (OPTEE_MESSAGE_ARG *)OpteeSharedMemoryInformation.Base;
   ZeroMem (MessageArg, sizeof (OPTEE_MESSAGE_ARG));
