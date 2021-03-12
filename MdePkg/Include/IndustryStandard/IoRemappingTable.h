@@ -14,7 +14,7 @@
 
 #include <IndustryStandard/Acpi.h>
 
-#define EFI_ACPI_IO_REMAPPING_TABLE_REVISION        0x0
+#define EFI_ACPI_IO_REMAPPING_TABLE_REVISION        0x3
 
 #define EFI_ACPI_IORT_TYPE_ITS_GROUP                0x0
 #define EFI_ACPI_IORT_TYPE_NAMED_COMP               0x1
@@ -22,6 +22,7 @@
 #define EFI_ACPI_IORT_TYPE_SMMUv1v2                 0x3
 #define EFI_ACPI_IORT_TYPE_SMMUv3                   0x4
 #define EFI_ACPI_IORT_TYPE_PMCG                     0x5
+#define EFI_ACPI_IORT_TYPE_RMR                      0x6
 
 #define EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA           BIT0
 
@@ -54,8 +55,9 @@
 #define EFI_ACPI_IORT_SMMUv3_MODEL_HISILICON_HI161X 0x1
 #define EFI_ACPI_IORT_SMMUv3_MODEL_CAVIUM_CN99XX    0x2
 
-#define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED  0x0
-#define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED    0x1
+#define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED    0x0
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PRI_SUPPORTED    0x1
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_FWD_SUPPORTED    0x2
 
 #define EFI_ACPI_IORT_ID_MAPPING_FLAGS_SINGLE       BIT0
 
@@ -89,7 +91,7 @@ typedef struct {
   UINT8                                   Type;
   UINT16                                  Length;
   UINT8                                   Revision;
-  UINT32                                  Reserved;
+  UINT32                                  Identifier;
   UINT32                                  NumIdMappings;
   UINT32                                  IdReference;
 } EFI_ACPI_6_0_IO_REMAPPING_NODE;
@@ -197,6 +199,23 @@ typedef struct {
   UINT64                                  Page1Base;
 //EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE      OverflowInterruptMsiMapping[1];
 } EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE;
+
+///
+/// Node type 6: RMR node
+///
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_NODE          Node;
+
+  UINT32                                  Flags;
+  UINT32                                  RmrCount;
+  UINT32                                  RmrOffset;
+} EFI_ACPI_6_0_IO_REMAPPING_RMR_NODE;
+
+typedef struct {
+  UINT64                                  Base;
+  UINT64                                  Length;
+  UINT32                                  Reserved;
+} EFI_ACPI_6_0_IO_REMAPPING_RMR_DESC;
 
 #pragma pack()
 
