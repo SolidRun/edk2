@@ -1130,12 +1130,6 @@
   # @Prompt Reclaim variable space at EndOfDxe.
   gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe|FALSE|BOOLEAN|0x30000008
 
-  ## Driver converts FVB function pointers.<BR><BR>
-  # The value is FALSE as default to retain the current behaviour and retain compatibility with out of tree platorms.<BR>
-  # If the value is set to TRUE, variable driver does not convert the FVB function pointers.<BR>
-  # @Prompt Platform driver converts FVB pointers.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDriverConvertsFvbFuncPointers|FALSE|BOOLEAN|0x3000000b
-
   ## The size of volatile buffer. This buffer is used to store VOLATILE attribute variables.
   # @Prompt Variable storage size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005

@@ -247,15 +247,13 @@ VariableClassAddressChangeEvent (
   UINTN          Index;
 
   if (mVariableModuleGlobal->FvbInstance != NULL) {
-    if (!PcdGetBool (PcdDriverConvertsFvbFuncPointers)) {
-      EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
-      EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
-      EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetAttributes);
-      EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->SetAttributes);
-      EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Read);
-      EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Write);
-      EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->EraseBlocks);
-    }
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetAttributes);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->SetAttributes);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Read);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Write);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->EraseBlocks);
     EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance);
   }
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLangCodes);
